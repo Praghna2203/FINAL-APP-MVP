@@ -1,0 +1,7 @@
+{
+  "name": "StarVoice: Galaxy Voice Journal",
+  "description": "A futuristic, dark-themed voice journaling app that visualizes your emotional journey as a constellation of nebulae.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
