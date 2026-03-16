@@ -1,6 +1,5 @@
-
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, ChevronLeft, Play, Pause, Trash2, Mic2, X, Eye, EyeOff, FileText } from 'lucide-react';
+import { Search, ChevronLeft, Play, Pause, Trash2, Mic2, X, Eye, EyeOff, FileText, Download } from 'lucide-react';
 import { Recording } from '../types';
 
 interface Props {
@@ -128,13 +127,16 @@ const RecordingList: React.FC<Props> = ({ recordings, onBack, onDelete }) => {
                   </div>
                   
                   <div className="flex items-center gap-2">
+                    
+                    {/* Play Button */}
                     <button 
                       onClick={(e) => handlePlayPause(e, recording)}
                       className={`p-3 rounded-full transition-all active:scale-90 ${playingId === recording.id ? 'bg-white text-black shadow-lg shadow-white/10' : 'bg-slate-800 text-slate-400 hover:text-white'}`}
                     >
                       {playingId === recording.id ? <Pause size={18} /> : <Play size={18} className="ml-0.5" />}
                     </button>
-                    
+
+                    {/* Read Button */}
                     <button 
                       onClick={(e) => toggleRead(e, recording.id)}
                       className={`px-4 py-3 rounded-full transition-all active:scale-90 flex items-center gap-2 ${isReading ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'bg-slate-800 text-slate-400 hover:text-white'}`}
@@ -143,12 +145,30 @@ const RecordingList: React.FC<Props> = ({ recordings, onBack, onDelete }) => {
                       <span className="text-[10px] font-bold uppercase tracking-widest">Read</span>
                     </button>
 
+                    {/* Download Button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const link = document.createElement("a");
+                        link.href = recording.audioUrl;
+                        link.download = `starvoice-${recording.id}.mp4`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                      }}
+                      className="p-3 rounded-full bg-slate-800 text-slate-400 hover:text-white transition-all active:scale-90"
+                    >
+                      <Download size={18} />
+                    </button>
+
+                    {/* Delete Button */}
                     <button 
                       onClick={(e) => handleDelete(e, recording.id)}
                       className="p-3 rounded-full bg-slate-900/50 text-slate-700 hover:text-red-400 transition-colors active:scale-90"
                     >
                       <Trash2 size={18} />
                     </button>
+
                   </div>
                 </div>
 
