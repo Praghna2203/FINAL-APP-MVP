@@ -7,7 +7,7 @@ export class GeminiService {
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
     if (!apiKey) {
-      console.error("Gemini API key is missing. Check your .env.local file.");
+      throw new Error("Gemini API key missing. Add VITE_GEMINI_API_KEY to environment variables.");
     }
 
     this.ai = new GoogleGenAI({ apiKey });
@@ -19,7 +19,7 @@ export class GeminiService {
   ): Promise<string> {
     try {
       const response = await this.ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-2.0-flash",
         contents: {
           parts: [
             {
@@ -29,7 +29,7 @@ export class GeminiService {
               },
             },
             {
-              text: "Transcribe this audio exactly. Just the text, nothing else.",
+              text: "Transcribe this audio exactly. Only return the spoken words.",
             },
           ],
         },
@@ -40,8 +40,8 @@ export class GeminiService {
 
       return response.text?.trim() || "[No speech detected]";
     } catch (error) {
-      console.error("Gemini Transcription Error:", error);
-      return "Error: Transcription failed.";
+      console.error("Gemini transcription failed:", error);
+      return "Transcription failed.";
     }
   }
 }
