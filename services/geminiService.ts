@@ -6,8 +6,6 @@ export class GeminiService {
   constructor() {
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
-    console.log("Gemini API key loaded:", !!apiKey);
-
     if (!apiKey) {
       throw new Error(
         "Gemini API key missing. Add VITE_GEMINI_API_KEY to environment variables."
@@ -34,12 +32,12 @@ export class GeminiService {
             parts: [
               {
                 inlineData: {
-                  mimeType: mimeType,
+                  mimeType,
                   data: base64Audio,
                 },
               },
               {
-                text: "Transcribe the spoken words in this audio. Return only the transcription text.",
+                text: "Transcribe the spoken words in this audio and return only the transcription.",
               },
             ],
           },
@@ -50,19 +48,9 @@ export class GeminiService {
       });
 
       const text = response.text?.trim();
-
-      if (!text) {
-        return "[No speech detected]";
-      }
-
-      return text;
+      return text || "[No speech detected]";
     } catch (error: any) {
       console.error("Gemini transcription failed:", error);
-
-      if (error?.message) {
-        return `Transcription failed: ${error.message}`;
-      }
-
       return "Transcription failed.";
     }
   }
