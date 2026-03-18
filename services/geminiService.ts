@@ -6,8 +6,12 @@ export class GeminiService {
   constructor() {
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
+    console.log("Gemini API key loaded:", !!apiKey);
+
     if (!apiKey) {
-      throw new Error("Gemini API key missing. Add VITE_GEMINI_API_KEY to environment variables.");
+      throw new Error(
+        "Gemini API key missing. Add VITE_GEMINI_API_KEY to environment variables."
+      );
     }
 
     this.ai = new GoogleGenAI({ apiKey });
@@ -18,29 +22,47 @@ export class GeminiService {
     mimeType: string = "audio/webm"
   ): Promise<string> {
     try {
+      if (!base64Audio) {
+        return "No audio data received.";
+      }
+
       const response = await this.ai.models.generateContent({
         model: "gemini-2.0-flash",
-        contents: {
-          parts: [
-            {
-              inlineData: {
-                mimeType,
-                data: base64Audio,
+        contents: [
+          {
+            role: "user",
+            parts: [
+              {
+                inlineData: {
+                  mimeType: mimeType,
+                  data: base64Audio,
+                },
               },
-            },
-            {
-              text: "Transcribe this audio exactly. Only return the spoken words.",
-            },
-          ],
-        },
+              {
+                text: "Transcribe the spoken words in this audio. Return only the transcription text.",
+              },
+            ],
+          },
+        ],
         config: {
           temperature: 0,
         },
       });
 
-      return response.text?.trim() || "[No speech detected]";
-    } catch (error) {
+      const text = response.text?.trim();
+
+      if (!text) {
+        return "[No speech detected]";
+      }
+
+      return text;
+    } catch (error: any) {
       console.error("Gemini transcription failed:", error);
+
+      if (error?.message) {
+        return `Transcription failed: ${error.message}`;
+      }
+
       return "Transcription failed.";
     }
   }
